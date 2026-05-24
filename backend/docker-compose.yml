@@ -1,0 +1,42 @@
+version: "3.9"
+
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: closira-api
+    ports:
+      - "8000:8000"
+    environment:
+      - APP_NAME=Closira Enquiry API
+      - APP_VERSION=1.0.0
+      - DEBUG=True
+      - DB_URL=sqlite:///./data/closira.db
+      - DB_ECHO=False
+      - LOG_LEVEL=INFO
+      - LOG_FORMAT=json
+      - SOP_KEYWORDS_FILE=/app/data/sop_rules.json
+      - SUGGESTED_RESPONSES_FILE=/app/data/suggested_responses.json
+      - MAX_CONVERSATION_HISTORY=50
+      - ESCALATION_PRIORITY_MIN=3
+      - CORS_ORIGINS=["*"]
+    volumes:
+      - ./data:/app/data
+      - ./logs:/app/logs
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    profiles:
+      - full-stack
+
+volumes:
+  db_data:
