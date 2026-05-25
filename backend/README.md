@@ -106,6 +106,75 @@ docker-compose down
 
 ---
 
+## Database Schema and Reasoning
+
+SQLite is used for a lightweight, zero-config local prototype. The schema is normalized around a single enquiry with child records for follow-ups, escalations, and timeline events.
+
+### Tables
+
+- enquiries
+  - id (UUID, PK)
+  - customer_name, customer_email, phone, channel
+  - subject, message
+  - status, priority, sop_matched, suggested_response
+  - conversation_history (JSON)
+  - created_at, updated_at
+- follow_ups
+  - id (UUID, PK)
+  - enquiry_id (FK -> enquiries.id)
+  - notes, created_at
+- escalations
+  - id (UUID, PK)
+  - enquiry_id (FK -> enquiries.id)
+  - reason, assignee, priority, status
+  - created_at, resolved_at
+- timelines
+  - id (UUID, PK)
+  - enquiry_id (FK -> enquiries.id)
+  - event, old_value, new_value, created_at
+- sops
+  - id (UUID, PK)
+  - name (unique), keywords, response_template
+  - priority, is_active, created_at
+
+### Why this design
+
+- Enquiry is the core aggregate; follow-ups, escalations, and timeline entries are one-to-many for auditability.
+- Timeline is a separate table to preserve a full state-change trail without inflating the enquiry row.
+- SOP rules are modeled separately so they can be stored in DB (or loaded from JSON) and evolved independently.
+
+---
+
+## Celery vs Background Tasks
+
+This prototype uses an in-process async task (asyncio) for SOP matching rather than Celery.
+
+### Decision
+
+- Background tasks keep the stack simple for a single-node prototype and avoid extra infra (broker, worker processes).
+
+### Trade-offs / Limitations
+
+- No durable queue, retries, or task persistence if the process crashes.
+- Limited scalability for high throughput; long tasks can block the event loop.
+- Not suitable for distributed processing or guaranteed delivery.
+
+If this were production, Celery (or a managed queue) would be the next step for durability and horizontal scaling.
+
+---
+
+## API Tests
+
+Use the REST Client file to exercise all five endpoints with sample payloads:
+
+- [backend/api-tests.http](backend/api-tests.http)
+
+---
+
+## Video Walkthrough (2–5 minutes)
+
+- Add your walkthrough link here.
+
 ## API Endpoints
 
 ### `POST /api/v1/enquiry`

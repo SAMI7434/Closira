@@ -1,0 +1,46 @@
+@baseUrl = http://localhost:8000/api/v1
+
+### Health check
+GET {{baseUrl}}/health
+
+### Create enquiry
+# @name createEnquiry
+POST {{baseUrl}}/enquiry
+Content-Type: application/json
+
+{
+  "customer_name": "Alice Johnson",
+  "customer_email": "alice@example.com",
+  "phone": "+1-555-0100",
+  "channel": "email",
+  "subject": "Refund request for order #1234",
+  "message": "I would like to request a refund for my recent order.",
+  "conversation_history": [
+    {"role": "customer", "content": "I want a refund"},
+    {"role": "agent", "content": "Sure, can you share your order number?"}
+  ]
+}
+
+### Use created enquiry id in follow-up and escalation
+@enquiryId = {{createEnquiry.response.body.id}}
+
+### Add follow-up
+POST {{baseUrl}}/enquiry/{{enquiryId}}/follow-up
+Content-Type: application/json
+
+{
+  "notes": "Called customer — they confirmed the refund was received."
+}
+
+### Escalate enquiry
+POST {{baseUrl}}/enquiry/{{enquiryId}}/escalate
+Content-Type: application/json
+
+{
+  "reason": "Customer demanding immediate refund. No SOP covers this case.",
+  "assignee": "agent-007",
+  "priority": "high"
+}
+
+### Get enquiry history
+GET {{baseUrl}}/enquiry/{{enquiryId}}/history
