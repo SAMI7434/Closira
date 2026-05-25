@@ -17,6 +17,8 @@ GET  /api/v1/health              Health check
 
 ## Architecture
 
+![Architecture diagram](../mermaid-diagram-2026-05-25-120519.png)
+
 ```
 app/
 ├── api/           FastAPI routers & dependency injection
