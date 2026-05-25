@@ -3,7 +3,11 @@
 Closira is an AI-powered customer communication platform for SMBs. It handles inbound enquiries across WhatsApp, email, and phone, using business-defined SOPs to qualify leads, schedule follow-ups, and escalate to human agents.\
 
 
+
 ![image alt](https://github.com/SAMI7434/Closira/blob/a172b015ba55bd61f8a7e3e08540ada945cbcf88/mermaid-diagram-2026-05-25-120519.png)
+
+![image alt](https://github.com/SAMI7434/Closira/blob/fd20ed6906900cb46634c57831c9fdcaaf059e0f/mermaid-diagram-2026-05-25-121923.png)
+
 
 ## Repository Structure
 
